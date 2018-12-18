@@ -1,4 +1,5 @@
 import sys
+import atexit
 from qtpy.QtWidgets import QMainWindow, QPushButton, QApplication
 import jfiredrake
 
@@ -21,11 +22,15 @@ class MyWindow(QMainWindow):
             self.cont, self.port = jfiredrake.start_instance()
         jfiredrake.open_browser(self.cont, self.port)
 
-    def quit(self):
+    @atexit.register
+    def cleanup(self):
         if self.cont:
             self.cont.stop()
             self.cont.remove()
             self.cont = None
+
+    def quit(self):
+        self.cleanup()
         self.app.exit()
 
 
